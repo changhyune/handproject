@@ -6,7 +6,7 @@
 //UUID setting
 BLEService CountingService("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
 // Characteristic setting 
-BLEStringCharacteristic IMUChar("6e400001-b5a3-f393-e0a9-e50e24dcca9e",BLEWrite ,30);
+BLEStringCharacteristic IMUChar("6e400002-b5a3-f393-e0a9-e50e24dcca9e",BLEWrite| BLERead |BLENotify ,30);
 //BLEStringCharacteristic PitchChar("6e400003-b5a3-f393-e0a9-e50e24dcca9e",BLEWrite ,10);
 //BLEStringCharacteristic YawChar("6e400004-b5a3-f393-e0a9-e50e24dcca9e",BLEWrite ,10);
 
@@ -59,6 +59,7 @@ Serial.println("Bluetooth device active, waiting for connections...");
 }
 
 void loop() {
+float sample;
 String x_heading, y_heading,z_heading;
 String imu_msg;
   // put your main code here, to run repeatedly:
@@ -80,18 +81,19 @@ BLEDevice central = BLE.central();
     // update the filter, which computes orientation:
     filter.updateIMU(xGyro, yGyro, zGyro, xAcc, yAcc, zAcc);
 
-    xAcc_now = xAcc;
     
     // print the heading, pitch and roll
-    x_heading = (String)filter.getRoll();
+    sample = filter.getRoll();
+    x_heading = (String)sample;
     y_heading = (String)filter.getPitch();
     z_heading = (String)filter.getYaw();
     imu_msg = x_heading + " " + y_heading + " " + z_heading;
       }
+      Serial.println(imu_msg);
       
       /*쓰기*/
         //before_t = millis();
-        IMUChar.writeValue((String)imu_msg);
+        IMUChar.writeValue(imu_msg);
         
   //    /*읽기*/
   //      if(CountingChar.written()) {
