@@ -4,13 +4,14 @@
 
 
 //UUID setting
-BLEService CountingService("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
+BLEService IMUService("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
 // Characteristic setting 
-BLEStringCharacteristic IMUChar("6e400002-b5a3-f393-e0a9-e50e24dcca9e",BLEWrite| BLERead |BLENotify ,30);
+BLEIntCharacteristic IMUxACC("6e400002-b5a3-f393-e0a9-e50e24dcca9e", BLEWrite | BLERead |BLENotify );
+BLEIntCharacteristic IMUyACC("6e400003-b5a3-f393-e0a9-e50e24dcca9e", BLEWrite | BLERead |BLENotify );
+BLEIntCharacteristic IMUzACC("6e400004-b5a3-f393-e0a9-e50e24dcca9e", BLEWrite | BLERead |BLENotify );
+
 //BLEStringCharacteristic PitchChar("6e400003-b5a3-f393-e0a9-e50e24dcca9e",BLEWrite ,10);
 //BLEStringCharacteristic YawChar("6e400004-b5a3-f393-e0a9-e50e24dcca9e",BLEWrite ,10);
-
-unsigned long before_t, after_t;
 
 // initialize a Madgwick filter:
 Madgwick filter;
@@ -19,12 +20,12 @@ const float sensorRate = 119.00;
   // values for acceleration and rotation:
   float xAcc, yAcc, zAcc;
   float xGyro, yGyro, zGyro;
-//  float mx, my, mz; // Magnometer #########
+  float mx, my, mz; // Magnometer #########
   float xAcc_now, xAcc_past;
   float xVel_now, xVel_past;
   float xPos;
-  unsigned long Time_past;
-  unsigned long Time_now;
+String imu_msg;
+unsigned long before_t , after_t;
 
 void setup() {
   // put your setup code here, to run once:
@@ -46,12 +47,13 @@ if (!BLE.begin()) {
   }
 
   BLE.setLocalName("QuitSmocking");
-  BLE.setAdvertisedService(CountingService); 
-  CountingService.addCharacteristic(IMUChar);
-//  CountingService.addCharacteristic(PitchChar);
-//  CountingService.addCharacteristic(YawChar);
+  BLE.setAdvertisedService(IMUService); 
+  IMUService.addCharacteristic(IMUxACC);
+  IMUService.addCharacteristic(IMUyACC);
+  IMUService.addCharacteristic(IMUzACC);
+
   
-  BLE.addService(CountingService);
+  BLE.addService(IMUService);
 
   BLE.advertise();
   
@@ -59,53 +61,49 @@ Serial.println("Bluetooth device active, waiting for connections...");
 }
 
 void loop() {
-float sample;
-String x_heading, y_heading,z_heading;
-String imu_msg;
   // put your main code here, to run repeatedly:
 BLEDevice central = BLE.central();
 
   if (central) {
     Serial.print("Connected to central: ");
     Serial.println(central.address());
-      
+       
+
       while(central.connected()){
 
-         if (IMU.accelerationAvailable() &&
-      IMU.gyroscopeAvailable()&& IMU.magneticFieldAvailable()) {
-    // read accelerometer &and gyrometer:
-    IMU.readAcceleration(xAcc, yAcc, zAcc);
-    IMU.readGyroscope(xGyro, yGyro, zGyro);
-//    IMU.readMagneticField(mx, my, mz); // ##############
-
-    // update the filter, which computes orientation:
-    filter.updateIMU(xGyro, yGyro, zGyro, xAcc, yAcc, zAcc);
-
-    
-    // print the heading, pitch and roll
-    sample = filter.getRoll();
-    x_heading = (String)sample;
-    y_heading = (String)filter.getPitch();
-    z_heading = (String)filter.getYaw();
-    imu_msg = x_heading + " " + y_heading + " " + z_heading;
-      }
-      Serial.println(imu_msg);
+       //before_t = millis();
+       
+       if (IMU.accelerationAvailable() &&
+           IMU.gyroscopeAvailable()&& IMU.magneticFieldAvailable()) {
+          // read accelerometer &and gyrometer:
+          IMU.readAcceleration(xAcc, yAcc, zAcc);
+          IMU.readGyroscope(xGyro, yGyro, zGyro);
+          IMU.readMagneticField(mx, my, mz); // ##############
       
-      /*쓰기*/
-        //before_t = millis();
-        IMUChar.writeValue(imu_msg);
+          // update the filter, which computes orientation:
+          
+          // print the heading, pitch and roll
+          //imu_msg = (String)xAcc +" " + (String)yAcc +" " +(String)zAcc + " " + (String)xGyro + " " + (String)yGyro + " " + (String)zGyro + " " + (String)mx +" " + (String)my +" " + (String)mz;
+        } 
+        //Serial.println( millis() - before_t);
+
         
+      /*쓰기*/
+        IMUxACC.writeValue((int)100 * xAcc);
+        IMUyACC.writeValue((int)100 * yAcc);
+        IMUzACC.writeValue((int)100 * zAcc);
+
   //    /*읽기*/
-  //      if(CountingChar.written()) {
-  //          if (CountingChar.value()) {
-  //              
-  //              float val = CountingChar.value();
-  //              Serial.print("Counting: ");
-  //              Serial.println(val);
-  //              
-  //              
-  //          }//value
-  //      }//written
+//        if(IMUxACC.written()) {
+//            if (IMUxACC.value()) {
+//                
+//                int val = IMUxACC.value();
+//                Serial.print("Counting: ");
+//                Serial.println(val);
+//                
+//                
+//            }//value
+//        }//written
     }//connected
   }//central
 }
