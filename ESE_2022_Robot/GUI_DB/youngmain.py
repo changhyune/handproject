@@ -3,9 +3,8 @@ import sys
 from PyQt4 import QtGui, QtCore, uic
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+
 import database
-reload(sys)
-sys.setdefaultencoding('utf-8')
 
 form_class = uic.loadUiType("userui.ui")[0]
 
@@ -50,65 +49,30 @@ class UI(QtGui.QMainWindow, form_class):
         
         self.addroutine_6.clicked.connect(self.addroutine)
         self.deleteroutine_6.clicked.connect(self.deleteroutine)
-        self.nowroutine_6.activated[str].connect(self.changeroutinepage)
         self.saveroutinedb_6.clicked.connect(self.saveroutine)
         
     #silsigan pose-check
     def goto2(self):
-        self.stackedWidget.setCurrentWidget(self.page_2)
-        self.nowroutine_2.setText(self.nowroutine_6.currentText())   
+        self.stackedWidget.setCurrentWidget(self.page_2)   
     
     # record
     def goto3(self):
         mydb = database.db()
-        
+        row = mydb.returnDayworkoutRows()
+        count = len(row)
+       
         current_day = QDate.currentDate()
         self.stackedWidget.setCurrentWidget(self.page_3)
-        for i in range(1,8,1):
-            nowday = "day"+str(i)+"_3"
-            getattr(self, nowday).setText(current_day.addDays(i-7).toString('MM.dd'))
-
-        for i in range(7):
-            nowday = current_day.addDays(-i).toString('yyyy-MM-dd')
-            row = mydb.returnDayworkoutRows(nowday)
-            count = len(row)
-
-            for x in range(count):
-                name, time = row[x] 
-                workrecord = "day"+str(7-i)+str(x+1)+"_3"
-                getattr(self, workrecord).setText(name+time)
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        # for x in range(count):
-        #     day, name, time = row[x]
-        #     for i in range(7):
-        #         if day == current_day.addDays(-i).toString('yyyy-MM-dd'):
-        #             for z in range(6):
-        #                 workrecord = "day"+str(7-i)+str(z+1)+"_3"
-        #                 if getattr(self, workrecord).text()!=None:
-        #                     continue
-        #                 getattr(self, workrecord).setText(name+time)
-            
-            # if day == current_day.toString('YY-MM-dd'):
-            #     print("good")
-            #     for i in range(1, 6):
-            #         day7 = "day7" +str(i)+ "_3"
-            #         getattr(self, day7).setText(name, time)
-        # self.day7_3.setText(current_day.toString('MM.dd'))
-        # self.day6_3.setText(current_day.addDays(-1).toString('MM.dd'))
-        # self.day5_3.setText(current_day.addDays(-2).toString('MM.dd'))
-        # self.day4_3.setText(current_day.addDays(-3).toString('MM.dd'))
-        # self.day3_3.setText(current_day.addDays(-4).toString('MM.dd'))
-        # self.day2_3.setText(current_day.addDays(-5).toString('MM.dd'))
-        # self.day1_3.setText(current_day.addDays(-6).toString('MM.dd'))
+        self.day7_3.setText(current_day.toString('MM.dd'))
+        self.day6_3.setText(current_day.addDays(-1).toString('MM.dd'))
+        self.day5_3.setText(current_day.addDays(-2).toString('MM.dd'))
+        self.day4_3.setText(current_day.addDays(-3).toString('MM.dd'))
+        self.day3_3.setText(current_day.addDays(-4).toString('MM.dd'))
+        self.day2_3.setText(current_day.addDays(-5).toString('MM.dd'))
+        self.day1_3.setText(current_day.addDays(-6).toString('MM.dd'))
+        self.label_66.setText(row[0][1])
+        self.label_67.setText(row[1][1])
+        self.label_64.setText(row[2][1])
         
     #calibration
     def goto4(self):
@@ -138,12 +102,11 @@ class UI(QtGui.QMainWindow, form_class):
     def start_finish(self):
         global a
         a = a+1
-        #woondongsizak
         if a%2 == 0:       
             print(self.cb1_2.currentText())
             print(self.cb2_2.currentText())  
             print(self.cb3_2.currentText())     
-            #self.nowstate_2.setText(self.cb1_2.currentText())  
+            self.nowstate_2.setText(self.cb1_2.currentText())  
             self.leftangle1_2.setText("check")
             self.leftangle2_2.setText("check")
             self.rightangle1_2.setText("check")
@@ -155,7 +118,7 @@ class UI(QtGui.QMainWindow, form_class):
             print(self.cb1_2.currentText())
             print(self.cb2_2.currentText())  
             print(self.cb3_2.currentText())     
-            #self.nowstate_2.setText("")  
+            self.nowstate_2.setText("")  
             self.leftangle1_2.setText("notcheck")
             self.leftangle2_2.setText("notcheck")
             self.rightangle1_2.setText("notcheck")
@@ -189,14 +152,9 @@ class UI(QtGui.QMainWindow, form_class):
     #         self.routine_1.setItem(i, 1, QTableWidgetItem(self.cb2_6.currentText()))
     #         self.routine_1.setItem(i, 2, QTableWidgetItem(self.cb3_6.currentText()))
     #         self.routine_1.setItem(i, 3, QTableWidgetItem(self.cb4_6.currentText()))
-    def changeroutinepage(self):
-        for i in range(1,7,1):
-            if self.nowroutine_6.currentText() == "routine " +str(i) :
-                currentroutinepage = "routinepage_"+str(i)    
-                self.stackedWidget_2.setCurrentWidget(getattr(self, currentroutinepage))
-        
-        
+    
     def addroutine(self):
+        
         for i in range(1,7,1):
             if self.nowroutine_6.currentText() == "routine " +str(i) :
                 currentroutine = "routine_"+str(i)
@@ -209,28 +167,26 @@ class UI(QtGui.QMainWindow, form_class):
         getattr(self, currentroutine).setItem(j, 3, QTableWidgetItem(self.cb4_6.currentText()))        
           
     def deleteroutine(self):
-        for i in range(1,7,1):
-            if self.nowroutine_6.currentText() == "routine "+str(i):
-                currentroutine = "routine_"+str(i)
-                for j in range(4,-1,-1):
-                    if getattr(self, currentroutine).item(j,0) != None:
-                        break
-        getattr(self, currentroutine).setItem(j, 0, None)
-        getattr(self, currentroutine).setItem(j, 1, None)
-        getattr(self, currentroutine).setItem(j, 2, None)
-        getattr(self, currentroutine).setItem(j, 3, None)
-         
+        if self.nowroutine_6.currentText() == "routine 1":
+            for i in range(4,-1,-1):
+                if self.routine_1.item(i,0) != None:
+                    break
+            self.routine_1.setItem(i, 0, None)
+            self.routine_1.setItem(i, 1, None)
+            self.routine_1.setItem(i, 2, None)
+            self.routine_1.setItem(i, 3, None)
+
+    def saveroutine(self):
+        mydb = database.db()
+        mydb.insertWorkoutData()
+        print(self.routine_1.item(0, 0).text())
+        
     #   
     def liveupdate(self):
         self.th.start()
         self.th.change_value2.connect(self.label_83.setText)
         self.th.change_value1.connect(self.label_87.setText)
-
-    def saveroutine(self):
-        mydb = database.db()
-        #mydb.insertWorkoutData()
-        print(self.routine_1.item(0, 0).text())
-            
+        
         
 class Thread1(QThread): 
     

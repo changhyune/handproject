@@ -160,27 +160,20 @@ class db(sqlite_lib):
             workoutid integer not null)
             '''
 
-        # 장기 피드백 데이터 베이스(날짜, 운동 루틴)
+        # 장단기 피드백 데이터 베이스()
         sql4 = '''CREATE TABLE if not exists daywork(
-            time DATETIME DEFAULT (strftime('%Y-%m-%d', DATETIME('now', 'localtime'))),
-            name text not null)'''
-
-
-        # 단기 피드백 데이터 베이스(시간, )
-        sql5 = '''CREATE TABLE if not exists livedata(
-            time text not null,
+            day DATETIME DEFAULT (strftime('%Y-%m-%d', DATETIME('now', 'localtime'))),
             name text not null,
-            leftFB float not null,
-            rightFB float not null,
-            leftLR float not null,
-            rightLR float not null
+            time text not null,
+            kcal float not null,
+            set_result float not null,
+            num_result float not null
             )'''
 
         self.sql_exec(sql1)
         self.sql_exec(sql2)
         self.sql_exec(sql3)
         self.sql_exec(sql4)
-        self.sql_exec(sql5)
         self.close()
 
     # 운동 정보 입력 함수
@@ -216,9 +209,20 @@ class db(sqlite_lib):
                 sqlInsert = '''INSERT INTO mappingR2W(routineid, workoutid) VALUES('{}', '{}')'''.format(routineID, workoutID)
                 self.sql_exec(sqlInsert)
             self.close()
-
     
-
+    # for GUI INSERT DATA
+    def GuiInsertWorkout(self, row):
+        self = sqlite_lib()
+        self.open()
+        count = len(row)
+        for x in range(count):
+            name, aim_set, aim_num = row[x]
+            sql = '''INSERT INTO workout(name, aim_set, aim_num) VALUES('{}', '{}', '{}')'''.format(name, aim_set, aim_num)
+            self.sql_exec(sql)
+        
+        #for x in range(count):
+            
+    
     # 루틴에 따른 운동정보 출력 함수
     def printWorkoutInfo(self):
         self = sqlite_lib()
@@ -237,6 +241,16 @@ class db(sqlite_lib):
             print(row)
 
         self.close()
+
+    # 운동 결과 데이터 추출 함수
+    def returnDayworkoutRows(self, day):
+        self = sqlite_lib()
+        self.open("database.db")
+        sql = '''SELECT name, time FROM daywork WHERE day = "%s"'''%day
+        self.sql_exec(sql)
+        rows = self.cur.fetchall()
+        self.close()
+        return rows    
 
     # 운동정보 출력 함수
     def printwork(self):
@@ -314,4 +328,3 @@ if __name__ == '__main__':
             dbsql.printwork()
             dbsql.printWorkoutInfo()
     
-
