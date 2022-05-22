@@ -50,7 +50,7 @@ appHeader{
      </sizepolicy>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="page">
      <widget class="QFrame" name="frame">
@@ -188,7 +188,16 @@ appHeader{
        <property name="spacing">
         <number>0</number>
        </property>
-       <property name="margin">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
@@ -957,7 +966,16 @@ appHeader{
         <property name="spacing">
          <number>0</number>
         </property>
-        <property name="margin">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
          <number>0</number>
         </property>
         <item>
@@ -1189,7 +1207,16 @@ appHeader{
         <property name="spacing">
          <number>0</number>
         </property>
-        <property name="margin">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
          <number>0</number>
         </property>
         <item>
@@ -1454,6 +1481,19 @@ appHeader{
          <y>10</y>
          <width>173</width>
          <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="resttime_2">
+       <property name="geometry">
+        <rect>
+         <x>540</x>
+         <y>360</y>
+         <width>211</width>
+         <height>31</height>
         </rect>
        </property>
        <property name="text">
